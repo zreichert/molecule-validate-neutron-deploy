@@ -4,8 +4,24 @@
   git:
     repo=https://github.com/openstack/openstack-ansible-ops.git
     dest=/opt/openstack-ansible-ops
+
+- name: Check the proper inventory file for queens and later releases
+  stat:
+    path: /opt/openstack-ansible/inventory/dynamic_inventory.py
+  register: invstat
+
+- name: Set Inventory Fact Based on Previous Stat
+  set_fact:
+    inventory_file: "/opt/openstack-ansible/inventory/dynamic_inventory.py"
+  when: invstat.stat.exists == True
+
+- name: Set Inventory Fact Based on Previous Stat
+  set_fact:
+    inventory_file: "/opt/openstack-ansible/playbooks/inventory/dynamic_inventory.py"
+  when: invstat.stat.exists == False
+
 - name: Create networks
-  shell: ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i /opt/openstack-ansible/playbooks/inventory/dynamic_inventory.py --tags create_networks openstack-service-setup.yml
+  shell: ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i {{ inventory_file }} --tags create_networks openstack-service-setup.yml
   args:
     executable: /bin/bash
     chdir: /opt/openstack-ansible-ops/multi-node-aio-xenial-ansible/playbooks/
