@@ -21,7 +21,7 @@
   when: invstat.stat.exists == False
 
 - name: Create networks
-  shell: ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i {{ inventory_file }} --tags create_networks openstack-service-setup.yml
+  shell: ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i {{ inventory_file }} --tags create_networks openstack-service-setup.yml -e enable_provider_net_dhcp=true
   args:
     executable: /bin/bash
     chdir: /opt/openstack-ansible-ops/multi-node-aio-xenial-ansible/playbooks/
