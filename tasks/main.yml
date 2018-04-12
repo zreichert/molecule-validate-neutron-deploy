@@ -27,7 +27,7 @@
 - name: Create networks
   shell: |
     . /opt/ansible-runtime/bin/activate
-    ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i {{ inventory_file }} --tags create_networks openstack-service-setup.yml -e enable_provider_net_dhcp=true
+    ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i {{ inventory_file }} --skip-tags "create_flavors,create_images" openstack-service-setup.yml -e enable_provider_net_dhcp=true
     deactivate
   args:
     executable: /bin/bash
