@@ -11,6 +11,7 @@
     state: present
     virtualenv: /opt/ansible-runtime
   with_items:
+    - ansible
     - shade
     - ipaddr
     - netaddr
