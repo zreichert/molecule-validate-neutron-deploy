@@ -1,0 +1,34 @@
+---
+# tasks file for molecule-validate-neutron-deploy
+
+- name: Find the proper inventory file
+  shell: find /opt/openstack-ansible -name dynamic_inventory.py -print
+  register: find_inventory_file
+  ignore_errors: True
+
+- name: Set proper inventory file
+  set_fact:
+    inventory_file: "{{ find_inventory_file.stdout }}"
+
+- name: Run openstack-service-setup.yml playbook in virtualenv on SUT
+  shell: |
+    . /opt/molecule-test-env-on-sut/bin/activate
+    ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i {{ inventory_file }} openstack-service-setup.yml
+    deactivate
+  args:
+    executable: /bin/bash
+    chdir: /opt/openstack-ansible-ops/multi-node-aio-xenial-ansible/playbooks/
+
+- name: create directory for ansible custome facts
+  file:
+    state: directory
+    recurse: yes
+    path: /etc/ansible/facts.d
+
+- name: install custom fact for service setup
+  copy:
+    content: "{\"already_ran\" : \"true\"}"
+    dest: /etc/ansible/facts.d/service_setup.fact
+
+- name: re-read facts after adding custome fact
+  setup: filter=ansible_local
